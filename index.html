@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<style>
+#grid {
+    margin: auto;
+	position: relative;
+    width: 600px;
+	height: calc(600px * 16 / 9);
+	cursor: crosshair;
+}
+#grid img {
+    width: 100%;
+    display: block;
+	position: absolute;
+	z-index: 0;
+}
+#grid .tile {
+    border: solid transparent;
+	border-width: 0.5px 0 0 0.5px;
+	box-sizing: border-box;
+	float: left;
+	z-index: 1;
+	position: relative;
+}
+#grid.show-grid .tile {
+    border-color: rgba(0, 0, 0, 0.2);
+}
+#grid.show-highlight .tile.highlighted {
+    background: rgba(255, 255, 255, 0.1);
+}
+#grid.show-highlight .tile.text-highlighted {
+    color: tomato;
+}
+#grid.black-white img {
+    filter: grayscale(100%);
+}
+#menu {
+    position: relative;
+    float: left;
+}
+</style>
+
+<div id="menu">
+	<button type="button" title="F" onclick="toggleGreyFilter()">Black n' White/Colour</button>
+	<button type="button" title="G" onclick="toggleGridVisibility()">Grid</button>
+	<button type="button" title="H" onclick="toggleHighlightVisibility()">Highlight</button>
+</div>
+
+<div id="grid" class="show-grid show-highlight black-white">
+    <img src="IMG_0796.JPG">
+</div>
+
+<script>
+var grid = document.getElementById("grid");
+var a = grid.clientWidth, b = grid.clientHeight;
+var i, j, x = 20;
+var _i = 0, _j = 0;
+var y = Math.ceil(x * b / a);
+var tiles = [];
+for (i = 0; i < y; i++) {
+    for (j = 0; j < x; j++) {
+	    var tile = document.createElement("div");
+        tile.className = "tile";
+	    tile.style.width = tile.style.height = a / x + "px";
+		if (j == 0) {
+		    tile.innerHTML = i;
+		}
+		if (i == 0) {
+		    tile.innerHTML = j;
+		}
+		tile.__i = i;
+		tile.__j = j;
+		grid.appendChild(tile);
+		tiles.push(tile);
+	}
+}
+
+tiles.forEach(function (tile) {
+    tile.onmouseover = function () {
+	    highlight(tile.__i, tile.__j);
+	};
+	grid.onmouseout = function () {
+		highlight(_i, _j);
+	};
+});
+
+highlight(_i, _j);
+
+function highlight(_i, _j) {
+    tiles.forEach(function (_tile) {
+		_tile.classList.remove("highlighted");
+		_tile.classList.remove("text-highlighted");
+		if (_j == _tile.__j || _i == _tile.__i) {
+			_tile.classList.add("highlighted");
+			if ((_i == _tile.__i && _tile.__j == 0) || (_j == _tile.__j && _tile.__i == 0)) {
+				_tile.classList.add("text-highlighted");
+			}
+		}
+	});
+}
+
+function toggleGreyFilter() {
+    grid.classList.toggle("black-white");
+}
+
+function toggleGridVisibility() {
+    grid.classList.toggle("show-grid");
+}
+
+function toggleHighlightVisibility() {
+    grid.classList.toggle("show-highlight");
+};
+
+window.addEventListener('keydown', function (event) {
+	switch (event.which) {
+		case 37: // left arrow
+			event.preventDefault();
+			if (_j > 0) {
+				_j--;
+			}
+			highlight(_i, _j);
+			break;
+		case 38: // up arrow
+			event.preventDefault();
+			if (_i > 0) {
+				_i--;
+			}
+			highlight(_i, _j);
+			break;
+		case 39: // right arrow
+			event.preventDefault();
+			if (_j < x - 1) {
+					_j++;
+				}
+				highlight(_i, _j);
+				break;
+		case 40: // down arrow
+			event.preventDefault();
+			if (_i < y - 1) {
+				_i++;
+			}
+			highlight(_i, _j);
+			break;
+		case 70: // f
+			event.preventDefault();
+			toggleGreyFilter();
+			break;
+		case 71: // g
+			event.preventDefault();
+			toggleGridVisibility();
+			break;
+		case 72: // h
+			event.preventDefault();
+			toggleHighlightVisibility();
+			break;
+	}
+});
+</script>
+
+</body>
+</html>
